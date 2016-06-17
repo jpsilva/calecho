@@ -28,6 +28,7 @@ function respond(req, res) {
               break;
             case 'js':
               res.end(wrapJS(renderHTML(calData)));
+              break;
           }
         });
       }
@@ -42,9 +43,10 @@ function respond(req, res) {
 function renderHTML(rawData) {
   var data = ical.parseICS(rawData),
       gigs = [],
-      output = '<table>';
+      output = '<table>',
+      k;
 
-  for (let k in data) {
+  for (k in data) {
     if (data.hasOwnProperty(k) && data[k].start && (data[k].start > new Date()) && data[k].summary !== 'Private') {
       gigs.push(data[k]);
     }
@@ -54,7 +56,7 @@ function renderHTML(rawData) {
     return a.start - b.start;
   });
 
-  gigs.forEach(function (gig, i) {
+  gigs.forEach(function (gig) {
     var address;
 
     if (gig['APPLE-STRUCTURED-LOCATION']) {
