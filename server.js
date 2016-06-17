@@ -85,6 +85,7 @@ function renderHTML(rawData) {
     '<style>' +
       '.gig-table { width: 100%; } ' +
       '.gig-address { padding-bottom: 1em; } ' +
+      '.gig-address-link-cell { padding-bottom: 1em; } ' +
     '</style>';
 
   return output;
