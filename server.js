@@ -43,7 +43,7 @@ function respond(req, res) {
 function renderHTML(rawData) {
   var data = ical.parseICS(rawData),
       gigs = [],
-      output = '<table>',
+      output = '<table class="gig-table">',
       k;
 
   for (k in data) {
@@ -57,22 +57,35 @@ function renderHTML(rawData) {
   });
 
   gigs.forEach(function (gig) {
-    var address;
+    var address, addressParts;
 
-    if (gig['APPLE-STRUCTURED-LOCATION']) {
-      address = gig['APPLE-STRUCTURED-LOCATION'].params[1].slice(11, -1);
+    if (gig['location']) {
+      address = gig['location'];
+      addressParts = address.match(/[^,\d]*, [A-Z]{2}(?=\s*\d{0,5}-?\d{0,4}(,\s(United States|USA|US))?)/);
     }
 
     output +=
-      '<tr><td>' + gig.summary + '</td><td>' + gig.start.format('{Dow}') +
-      ', <span class="keep-together">' + gig.start.format('{Mon} {date}, {year}') +
-      '</span> &nbsp; ' + gig.start.format('{h}:{mm}{t}') + '</td></tr><tr><td class="address-cell">' +
-      (address ? address.match(/[^,\d]*, [A-Z]{2}(?=\s*\d{0,5}-?\d{0,4},\sUnited States)/)[0] : '') +
-      '</td><td class="map-cell">' + (address ? '<a href="https://www.google.com/maps/?q=' + address + '">Map</a>' : '') +
-      '</td></tr>';
+      '<tr class="gig-row-1">' +
+        '<td class="gig-summary">' + gig.summary + '</td>' +
+        '<td class="gig-date">' +
+          '<span class="gig-date-day">' + gig.start.format('{Dow}') + '</span>, ' +
+          '<span class="gig-date-date">' + gig.start.format('{Mon} {date}, {year}') + '</span>' +
+          ' &nbsp; <span class="gig-date-time">' + gig.start.format('{h}:{mm}{t}') + '</span>' +
+        '</td>' +
+      '</tr>' +
+      '<tr class="gig-row-2">' +
+        '<td class="gig-address">' + (addressParts ? addressParts[0] : '') + '</td>' +
+        '<td class="gig-address-link-cell">' +
+          (address ? '<a class="gig-address-link" href="https://www.google.com/maps/?q=' + address + '">Map</a>' : '') +
+        '</td>' +
+      '</tr>';
   });
 
-  output += '</table>';
+  output += '</table>' +
+    '<style>' +
+      '.gig-table { width: 100%; } ' +
+      '.gig-address { padding-bottom: 1em; } ' +
+    '</style>';
 
   return output;
 }
